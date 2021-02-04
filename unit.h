@@ -6,15 +6,16 @@
 
 #define COLOR_OK "\033[32;1m"
 #define COLOR_ERR "\033[31;1m"
+#define COLOR_TEST "\033[34;1m"
 #define COLOR_NONE "\033[0m"
 
 // Wraps a test block in pretty printf-s
 #define test(name, block) \
-    printf("=> "name); \
+    printf("=> "COLOR_TEST name COLOR_NONE); \
     for (size_t i = sizeof(name); i < TEST_LABEL_WIDTH || i % 5; i++) \
         printf(" "); \
     do block while (0); \
-    printf("\n");
+    printf(" |\n");
 
 // Prints an error and returns if the condition is false
 #define assert(cond) \

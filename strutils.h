@@ -39,7 +39,7 @@ size_t str_bufsz(size_t len) {
 
     // Least power of two greater than len
     size_t bufsz = 1;
-    for (; len; len >> 1) { bufsz << 1; }
+    for (; len; len >> 1, bufsz << 1);
     return bufsz;
 }
 
@@ -130,11 +130,6 @@ void str_free(String str) {
 
     memset(str.str, 0, str.len);
     free(str.str);
-
-    str.flags = 0;
-    str.bufsz = 0;
-    str.len   = 0;
-    str.str   = NULL;
 }
 
 // Converts the string into a nul-terminated string.
@@ -151,27 +146,6 @@ char *cstr(const String str) {
     //     return str.str;
 
     return strncpy(malloc(str.len + 1), str.str, str.len);
-}
-
-/* * * * * * * MUTATION * * * * * * */
-
-// Appends the character to the given string
-void str_append(char c, String *str) {
-    if (!FLAGS_ALL(str->flags, STR_VALID | STR_HEAP))
-        fprintf(stderr, "Invalid string passed to str_append\n");
-
-    str_ensure_buf(str, str->len + 1);
-    str->str[str->len++] = c;
-}
-
-// Appends the suffix to the given string
-void str_appends(String suffix, String *str) {
-    if (!FLAGS_ALL(str->flags, STR_VALID | STR_HEAP))
-        fprintf(stderr, "Invalid string passed to str_appends\n");
-
-    str_ensure_buf(str, str->len + suffix.len);
-    strncpy(str->str + str->len, suffix.str, suffix.len);
-    str->len += suffix.len;
 }
 
 /* * * * * * * TRANSFORMATION * * * * * * */
@@ -199,7 +173,47 @@ String str_slice(String str, size_t offset, size_t len) {
     return str_nalloc(str.str + offset, len);
 }
 
-/* * * * * * * ANALYSIS * * * * * * */
+/* * * * * * * MUTATION * * * * * * */
+
+// Appends the character to the given string
+void str_push(char c, String *str) {
+    if (!FLAGS_ALL(str->flags, STR_VALID | STR_HEAP))
+        fprintf(stderr, "Invalid string passed to str_append\n");
+
+    str_ensure_buf(str, str->len + 1);
+    str->str[str->len++] = c;
+}
+
+// Appends the suffix to the given string
+void str_pushs(String suffix, String *str) {
+    if (!FLAGS_ALL(str->flags, STR_VALID | STR_HEAP))
+        fprintf(stderr, "Invalid string passed to str_appends\n");
+
+    str_ensure_buf(str, str->len + suffix.len);
+    strncpy(str->str + str->len, suffix.str, suffix.len);
+    str->len += suffix.len;
+}
+
+// Pops a character off the end of the given string into `out`
+// Returns false if the string is empty and a character cannot be popped
+bool str_pop(String *str, char *out) {
+    if (str->len == 0) return false;
+    if (out) *out = str->str[--str->len];
+    return true;
+}
+
+// Pops a string of length `n` off the end of the given string into `out`
+// Returns false if the string is shorter than `n` and such a string cannot
+// be popped
+// The popped string is allocated in a new buffer and requires str_free()
+bool str_popn(String *str, size_t n, String *out) {
+    if (str->len < n) return false;
+    if (out) *out = str_slice(*str, str->len - n, n);
+    str->len -= n;
+    return true;
+}
+
+/* * * * * * * INSPECTION * * * * * * */
 
 // Returns true if the two strings are equal and false otherwise
 bool str_eq(String a, String b) {

@@ -95,39 +95,89 @@ int main() {
             assert_streq("Hello, world!", s));
     });
 
-    test("str_append", {
+    test("str_push", {
         String str = str_alloc("Hello, wor");
         String clone = str_clone(str);
 
-        str_append('l', &str);
-        str_append('d', &str);
-        str_append('!', &str);
+        str_push('l', &str);
+        str_push('d', &str);
+        str_push('!', &str);
 
         assert(str_eq(str_ref("Hello, world!"), str));
         assert(str_eq(str_ref("Hello, wor"), clone));
-
-        printf("\nOriginal: "STR_DEBUG_FMT"\n", STR_DEBUG_FMT_ARGS(clone));
-        printf("Appended: "STR_DEBUG_FMT, STR_DEBUG_FMT_ARGS(str));
 
         str_free(str);
         str_free(clone);
     });
 
-    test("str_appends", {
+    test("str_push (overflow)", {
+        String str = str_alloc("");
+        for (size_t i = 0; i < STR_MIN_BUFSZ; i++) str_push('#', &str);
+
+        assert_eq(str.bufsz, (size_t)STR_MIN_BUFSZ, "%zu");
+
+        str_push('.', &str);
+
+        assert_eq(str.bufsz, (size_t)STR_MIN_BUFSZ * 2, "%zu");
+
+        str_free(str);
+    });
+
+    test("str_pushs", {
         String str = str_alloc("Hello");
         String clone = str_clone(str);
 
-        str_appends(str_ref(", "),    &str);
-        str_appends(str_ref("world"), &str);
-        str_appends(str_ref("!"),     &str);
+        str_pushs(str_ref(", "),    &str);
+        str_pushs(str_ref("world"), &str);
+        str_pushs(str_ref("!"),     &str);
 
         assert(str_eq(str_ref("Hello, world!"), str));
         assert(str_eq(str_ref("Hello"),         clone));
 
-        printf("\nOriginal: "STR_DEBUG_FMT"\n", STR_DEBUG_FMT_ARGS(clone));
-        printf("Appended: "STR_DEBUG_FMT, STR_DEBUG_FMT_ARGS(str));
-
         str_free(str);
         str_free(clone);
+    });
+
+    test("str_pop", {
+        String str = str_alloc("foo");
+
+        char c;
+
+        assert(str_pop(&str, &c));
+        assert_eq('o', c, "%c");
+
+        assert(str_pop(&str, &c));
+        assert_eq('o', c, "%c");
+
+        assert(str_pop(&str, &c));
+        assert_eq('f', c, "%c");
+
+        assert(!str_pop(&str, NULL));
+
+        str_free(str);
+    });
+
+    test("str_popn", {
+        String str = str_alloc("Hello, world!");
+
+        String s;
+
+        assert(str_popn(&str, 1, &s));
+        assert(str_eq(str_ref("!"), s));
+        str_free(s);
+
+        assert(str_popn(&str, 5, &s));
+        assert(str_eq(str_ref("world"), s));
+        str_free(s);
+
+        assert(!str_popn(&str, 10, NULL));
+
+        assert(str_popn(&str, 7, &s));
+        assert(str_eq(str_ref("Hello, "), s));
+        str_free(s);
+
+        assert(!str_popn(&str, 1, NULL));
+
+        str_free(str);
     });
 }
