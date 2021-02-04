@@ -167,7 +167,7 @@ void str_append(char c, String *str) {
 // Appends the suffix to the given string
 void str_appends(String suffix, String *str) {
     if (!FLAGS_ALL(str->flags, STR_VALID | STR_HEAP))
-        fprintf(stderr, "Invalid string passed to str_append\n");
+        fprintf(stderr, "Invalid string passed to str_appends\n");
 
     str_ensure_buf(str, str->len + suffix.len);
     strncpy(str->str + str->len, suffix.str, suffix.len);
@@ -188,7 +188,7 @@ String str_slice_ref(String str, size_t offset, size_t len) {
     return str_nref(str.str + offset, len);
 }
 
-// Allocates a string by taking a slice of the given string.
+// Allocates a string by taking a slice of the given string
 String str_slice(String str, size_t offset, size_t len) {
     STR_CHECK_VALID(str, str_slice);
 
