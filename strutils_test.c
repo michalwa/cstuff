@@ -23,8 +23,11 @@ int main() {
     String str2 = str_nref(s1, 5); // "Hello"
     String str3 = str_ref("l");    // "l"
 
+    String heap = str_alloc("Hello, world!");
+
     // Demo print
-    printf(STR_DEBUG_FMT"\n", STR_DEBUG_FMT_ARGS(str1));
+    printf("str_ref(s1) = "STR_DEBUG_FMT"\n", STR_DEBUG_FMT_ARGS(str1));
+    printf("str_alloc() = "STR_DEBUG_FMT"\n", STR_DEBUG_FMT_ARGS(heap));
 
     // Test equality comparison first, so we can use it in assertions
     test("str_eq", {
@@ -38,6 +41,8 @@ int main() {
         String str5 = str_nalloc(s1, 5);
 
         with(char, s, cstr(str1), assert_streq(s1, s));
+        with(char, s, cstr(heap), assert_streq(s1, s));
+
         with(char, s, cstr(str2), assert_streq(s2, s));
         with(char, s, cstr(str4), assert_streq(s1, s));
         with(char, s, cstr(str5), assert_streq(s2, s));
@@ -49,6 +54,11 @@ int main() {
     test("str_slice", {
         String slice = str_slice(str1, 0, 5);
         assert(str_eq(str_ref("Hello"), str_slice_ref(str1, 0, 5)));
+        assert(str_eq(str_ref("Hello"), slice));
+        str_free(slice);
+
+        slice = str_slice(heap, 0, 5);
+        assert(str_eq(str_ref("Hello"), str_slice_ref(heap, 0, 5)));
         assert(str_eq(str_ref("Hello"), slice));
         str_free(slice);
 
@@ -187,4 +197,6 @@ int main() {
 
         str_free(str);
     });
+
+    str_free(heap);
 }

@@ -45,10 +45,30 @@ String str_clone(String str);
 
 /* * * * * * * PRINTING * * * * * * */
 
+#define BYTE_BIN_FMT "%c%c%c%c%c%c%c%c"
+#define BYTE_BIN_FMT_ARGS(byte) \
+    (byte & 0x80 ? '1' : '0'), \
+    (byte & 0x40 ? '1' : '0'), \
+    (byte & 0x20 ? '1' : '0'), \
+    (byte & 0x10 ? '1' : '0'), \
+    (byte & 0x08 ? '1' : '0'), \
+    (byte & 0x04 ? '1' : '0'), \
+    (byte & 0x02 ? '1' : '0'), \
+    (byte & 0x01 ? '1' : '0')
+
 #define STR_FMT "%.*s"
 #define STR_FMT_ARGS(s) (int)s.len, s.str
-#define STR_DEBUG_FMT "{ flags = %x, bufsz = %zu, len = %zu, str = %.*s }"
-#define STR_DEBUG_FMT_ARGS(s) (int)s.flags, s.bufsz, s.len, (int)s.len, s.str
+
+#define STR_DEBUG_FMT \
+    "String {\n" \
+    "  flags = "BYTE_BIN_FMT",\n" \
+    "  bufsz = %zu,\n" \
+    "  len   = %zu,\n" \
+    "  str   = \"%.*s\"\n" \
+    "}"
+#define STR_DEBUG_FMT_ARGS(s) \
+    BYTE_BIN_FMT_ARGS(s.flags), \
+    s.bufsz, s.len, (int)s.len, s.str
 
 // Creates a dynamically allocated string using sprintf
 String str_fmt(size_t bufsz, const char *fmt, ...);
@@ -86,8 +106,7 @@ void str_pushs(String suffix, String *str);
 bool str_pop(String *str, char *out);
 
 // Pops a string of length `n` off the end of the given string into `out`
-// Returns false if the string is shorter than `n` and such a string cannot
-// be popped
+// Returns false if the string is shorter than `n` and such a string cannot be popped
 // The popped string is allocated in a new buffer and requires str_free()
 bool str_popn(String *str, size_t n, String *out);
 
