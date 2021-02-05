@@ -68,30 +68,30 @@ int main() {
         with(char, s, cstr(str4), assert_streq(s1, s));
         with(char, s, cstr(str5), assert_streq(s2, s));
 
-        str_free(str4);
-        str_free(str5);
+        str_free(&str4);
+        str_free(&str5);
     });
 
     test("str_slice", {
         String slice = str_slice(str1, 0, 5);
         assert_string_eq(str_ref("Hello"), str_slice_ref(str1, 0, 5));
         assert_string_eq(str_ref("Hello"), slice);
-        str_free(slice);
+        str_free(&slice);
 
         slice = str_slice(heap, 0, 5);
         assert_string_eq(str_ref("Hello"), str_slice_ref(heap, 0, 5));
         assert_string_eq(str_ref("Hello"), slice);
-        str_free(slice);
+        str_free(&slice);
 
         slice = str_slice(str1, 7, 100);
         assert_string_eq(str_ref("world!"), str_slice_ref(str1, 7, 100));
         assert_string_eq(str_ref("world!"), slice);
-        str_free(slice);
+        str_free(&slice);
 
         slice = str_slice(str1, 5, 0);
         assert_string_eq(str_ref(""), str_slice_ref(str1, 5, 0));
         assert_string_eq(str_ref(""), slice);
-        str_free(slice);
+        str_free(&slice);
     });
 
     test("str_count", {
@@ -150,8 +150,8 @@ int main() {
         assert_string_eq(str_ref("Hello, world!"), str);
         assert_string_eq(str_ref("Hello, wor"), clone);
 
-        str_free(str);
-        str_free(clone);
+        str_free(&str);
+        str_free(&clone);
     });
 
     test("str_push (overflow)", {
@@ -164,7 +164,7 @@ int main() {
 
         assert_eq(str.bufsz, (size_t)STR_MIN_BUFSZ * 2, "%zu");
 
-        str_free(str);
+        str_free(&str);
     });
 
     test("str_pushs", {
@@ -183,8 +183,8 @@ int main() {
         assert_string_eq(str_ref("Hello, world!"), str);
         assert_string_eq(str_ref("Hello"), clone);
 
-        str_free(str);
-        str_free(clone);
+        str_free(&str);
+        str_free(&clone);
     });
 
     test("str_pop", {
@@ -203,7 +203,7 @@ int main() {
 
         assert(!str_pop(&str, NULL));
 
-        str_free(str);
+        str_free(&str);
     });
 
     test("str_popn", {
@@ -214,7 +214,7 @@ int main() {
         assert(str_popn(&str, 1, &s));
         assert_string_eq(str_ref("!"), s);
         assert_string_eq(str_ref("Hello, world"), str);
-        str_free(s);
+        str_free(&s);
 
         assert(str_popn(&str, 5, NULL));
 
@@ -222,18 +222,18 @@ int main() {
         assert(str_popn(&str, 0, &s));
         assert_string_eq(str_ref(""), s);
         assert_string_eq(str_ref("Hello, "), str);
-        str_free(s);
+        str_free(&s);
 
         assert(!str_popn(&str, 10, NULL));
 
         assert(str_popn(&str, 7, &s));
         assert_string_eq(str_ref("Hello, "), s);
         assert_string_eq(str_ref(""), str);
-        str_free(s);
+        str_free(&s);
 
         assert(!str_popn(&str, 1, NULL));
 
-        str_free(str);
+        str_free(&str);
     });
 
     test("str_insert", {
@@ -248,7 +248,7 @@ int main() {
         str_insert('!', 100, &str);
         assert_string_eq(str_ref("Hello, world!"), str);
 
-        str_free(str);
+        str_free(&str);
     });
 
     test("str_inserts", {
@@ -264,7 +264,7 @@ int main() {
         str_inserts(str_ref("!"), 100, &str);
         assert_string_eq(str_ref("Hello, world!"), str);
 
-        str_free(str);
+        str_free(&str);
     });
 
     test("str_replace_slice", {
@@ -273,7 +273,7 @@ int main() {
         str_replace_slice(7, 5, str_ref("life"), &str);
         assert_string_eq(str_ref("Hello, life!"), str);
 
-        str_free(str);
+        str_free(&str);
     });
 
     test("str_replace", {
@@ -292,7 +292,7 @@ int main() {
         str_replace(str_ref("baz"), str_ref("foo"), &str, STR_REPLACE_REVERSE);
         assert_string_eq(str_ref("Hello, baz foo foo!"), str);
 
-        str_free(str);
+        str_free(&str);
     });
 
     String to_strip = str_ref(" . foo bar . ");
@@ -318,5 +318,5 @@ int main() {
         assert_string_eq(str_ref("foo bar"), str);
     });
 
-    str_free(heap);
+    str_free(&heap);
 }

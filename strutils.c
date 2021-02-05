@@ -90,11 +90,16 @@ String str_fmt(size_t bufsz, const char *fmt, ...) {
 
 /* * * * * * * CONSUMPTION * * * * * * */
 
-void str_free(String str) {
-    if (!FLAGS_ALL(str.flags, STR_VALID | STR_HEAP)) return;
+void str_free(String *str) {
+    if (!FLAGS_ALL(str->flags, STR_VALID | STR_HEAP)) return;
 
-    memset(str.str, 0, str.len);
-    free(str.str);
+    memset(str->str, 0, str->len);
+    free(str->str);
+
+    str->flags = 0;
+    str->bufsz = 0;
+    str->len   = 0;
+    str->str   = NULL;
 }
 
 char *cstr(String str) {
@@ -219,7 +224,7 @@ void str_replace_slice(size_t offset, size_t len, String repl, String *str) {
     memcpy(w, str->str + offset + len,
               str->len - offset - len); // str[offset + len..]
 
-    str_free(*str);
+    str_free(str);
     *str = r;
 }
 

@@ -77,7 +77,7 @@ String str_fmt(size_t bufsz, const char *fmt, ...);
 
 // Frees the buffer allocated for the given string
 // Calling this with a non-heap-allocated string will do nothing.
-void str_free(String str);
+void str_free(String *str);
 
 // Converts the string into a nul-terminated string.
 // The string buffer gets allocated on the heap
