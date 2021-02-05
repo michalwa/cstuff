@@ -147,7 +147,7 @@ void str_pushs(String suffix, String *str) {
         fprintf(stderr, "Invalid string passed to str_appends\n");
 
     str_ensure_buf(str, str->len + suffix.len);
-    strncpy(str->str + str->len, suffix.str, suffix.len);
+    memcpy(str->str + str->len, suffix.str, suffix.len);
     str->len += suffix.len;
 }
 
@@ -162,6 +162,24 @@ bool str_popn(String *str, size_t n, String *out) {
     if (out) *out = str_slice(*str, str->len - n, n);
     str->len -= n;
     return true;
+}
+
+void str_insert(char c, size_t pos, String *str) {
+    if (pos >= str->len) { str_push(c, str); return; }
+
+    str_ensure_buf(str, str->len + 1);
+    memmove(str->str + pos + 1, str->str + pos, str->len - pos);
+    str->str[pos] = c;
+    str->len++;
+}
+
+void str_inserts(String infix, size_t pos, String *str) {
+    if (pos >= str->len) { str_pushs(infix, str); return; }
+
+    str_ensure_buf(str, str->len + infix.len);
+    memmove(str->str + pos + infix.len, str->str + pos, str->len - pos);
+    memcpy(str->str + pos, infix.str, infix.len);
+    str->len += infix.len;
 }
 
 /* * * * * * * INSPECTION * * * * * * */

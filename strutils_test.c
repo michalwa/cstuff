@@ -204,5 +204,32 @@ int main() {
         str_free(str);
     });
 
+    test("str_insert", {
+        String str = str_alloc("Helloworld");
+
+        str_insert(',', 5, &str);
+        assert(str_eq(str_ref("Hello,world"), str));
+
+        str_insert(' ', 6, &str);
+        assert(str_eq(str_ref("Hello, world"), str));
+
+        str_insert('!', 100, &str);
+        assert(str_eq(str_ref("Hello, world!"), str));
+
+        str_free(str);
+    });
+
+    test("str_inserts", {
+        String str = str_alloc("world");
+
+        str_inserts(str_ref("Hello, "), 0, &str);
+        assert(str_eq(str_ref("Hello, world"), str));
+
+        str_inserts(str_ref("!"), 100, &str);
+        assert(str_eq(str_ref("Hello, world!"), str));
+
+        str_free(str);
+    });
+
     str_free(heap);
 }

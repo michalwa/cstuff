@@ -110,6 +110,16 @@ bool str_pop(String *str, char *out);
 // The popped string is allocated in a new buffer and requires str_free()
 bool str_popn(String *str, size_t n, String *out);
 
+// Inserts a character into the string at the specified position
+// If the position is outside the bounds of the string, the character is appended
+// to the end of the string
+void str_insert(char c, size_t pos, String *str);
+
+// Inserts a string into another string at the specified position
+// If the position is outside the bounds of the string, the infix is appended
+// to the end of the string
+void str_inserts(String infix, size_t pos, String *str);
+
 /* * * * * * * INSPECTION * * * * * * */
 
 // Returns true if the two strings are equal and false otherwise
