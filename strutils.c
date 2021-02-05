@@ -116,8 +116,7 @@ String str_slice_ref(String str, size_t offset, size_t len) {
     STR_CHECK_VALID(str, str_slice_ref);
 
     if (offset + len > str.len)
-        fprintf(stderr, "Slice len out of bounds: "STR_FMT" [%zu, %zu]\n",
-                STR_FMT_ARGS(str), offset, len);
+        len = str.len - offset;
 
     return str_nref(str.str + offset, len);
 }
@@ -126,8 +125,7 @@ String str_slice(String str, size_t offset, size_t len) {
     STR_CHECK_VALID(str, str_slice);
 
     if (offset + len > str.len)
-        fprintf(stderr, "Slice len out of bounds: "STR_FMT" [%zu, %zu]\n",
-                STR_FMT_ARGS(str), offset, len);
+        len = str.len - offset;
 
     return str_nalloc(str.str + offset, len);
 }
@@ -206,30 +204,40 @@ void str_replace_slice(size_t offset, size_t len, String repl, String *str) {
     if (len == 0)           { str_inserts(repl, offset, str); return; }
     if (offset >= str->len) { str_pushs(repl, str); return; }
 
-    //          ,----------- str->len -------------,
-    //   str    |############|@@@@@@@@@|%%%%%%%%%%%|
-    //          `-- offset --`-- len --`
-    //
-    //          ,--------------- r.len -----------------,
-    // r(esult) |############|??????????????|%%%%%%%%%%%|
-    //                       `-- repl.len --`
-
     String r;
     r.flags = STR_VALID | STR_HEAP;
     r.len   = str->len - len + repl.len;
     r.bufsz = str_bufsz(r.len);
     char *w = r.str = malloc(r.bufsz);
 
-    memcpy(w, str->str, offset);
+    memcpy(w, str->str, offset); // str[..offset]
     w += offset;
 
-    memcpy(w, repl.str, repl.len);
+    memcpy(w, repl.str, repl.len); // repl
     w += repl.len;
 
-    memcpy(w, str->str + offset + len, str->len - offset - len);
+    memcpy(w, str->str + offset + len,
+              str->len - offset - len); // str[offset + len..]
 
     str_free(*str);
     *str = r;
+}
+
+int str_replace(String pat, String repl, String *str, StrReplaceFlags flags) {
+    int (*pos_fn)(String, String, size_t) =
+        (flags & STR_REPLACE_REVERSE) ? str_rpos : str_lpos;
+
+    int pos;
+    int n = 0;
+
+    while ((pos = pos_fn(pat, *str, 0)) >= 0) {
+        str_replace_slice(pos, pat.len, repl, str);
+        n++;
+
+        if (!(flags & STR_REPLACE_ALL)) break;
+    }
+
+    return n;
 }
 
 /* * * * * * * INSPECTION * * * * * * */
@@ -237,6 +245,44 @@ void str_replace_slice(size_t offset, size_t len, String repl, String *str) {
 bool str_eq(String a, String b) {
     if (a.len != b.len) return false;
     return !strncmp(a.str, b.str, a.len);
+}
+
+int str_lpos(String needle, String haystack, size_t offset) {
+    if (offset + needle.len > haystack.len) return -1;
+
+    for (size_t i = offset; i < haystack.len; i++) {
+        bool eq = true;
+
+        for (size_t j = 0; j < needle.len; j++) {
+            if (haystack.str[i + j] != needle.str[j]) {
+                eq = false;
+                break;
+            }
+        }
+
+        if (eq) return i;
+    }
+
+    return -1;
+}
+
+int str_rpos(String needle, String haystack, size_t offset) {
+    if (needle.len > haystack.len - offset) return -1;
+
+    for (int i = haystack.len - offset - needle.len; i >= 0; i--) {
+        bool eq = true;
+
+        for (size_t j = 0; j < needle.len; j++) {
+            if (haystack.str[i + j] != needle.str[j]) {
+                eq = false;
+                break;
+            }
+        }
+
+        if (eq) return i;
+    }
+
+    return -1;
 }
 
 int str_count(char c, String str) {

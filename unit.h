@@ -43,16 +43,6 @@
         return ASSERT_FAIL_RETURN; \
     }
 
-// Prints an error and returns if the two values are equal
-#define assert_neq(a, b, fmt) \
-    if (a != b) printf(OK); \
-    else { \
-        printf(ERR"Inequality assertion failed (%s:%d):\n" \
-               "Left:  "fmt"\n" \
-               "Right: "fmt"\n", __FILE__, __LINE__, a, b); \
-        return ASSERT_FAIL_RETURN; \
-    }
-
 // Prints an error and returns if the two C-strings are not equal
 #define assert_streq(a, b) \
     if (!strcmp(a, b)) printf(OK); \
@@ -63,14 +53,18 @@
         return ASSERT_FAIL_RETURN; \
     }
 
-
-// Prints an error and returns if the two C-strings are equal
-#define assert_strneq(a, b) \
-    if (strcmp(a, b)) printf(OK); \
+// Asserts equality for a custom type
+//  a, b    - values to compare
+//  cmp     - comparison function
+//  fmt     - printf format
+//  fmtargs - printf format args macro
+#define assert_custom_eq(a, b, cmp, fmt, fmtargs) \
+    if (cmp(a, b)) printf(OK); \
     else { \
-        printf(ERR"Inequality assertion failed (%s:%d):\n" \
-               "Left:  %s\n" \
-               "Right: %s\n", __FILE__, __LINE__, a, b); \
+        printf(ERR"Equality assertion failed (%s:%d):\n" \
+               "Left:  "fmt"\n" \
+               "Right: "fmt"\n", __FILE__, __LINE__, \
+               fmtargs(a), fmtargs(b)); \
         return ASSERT_FAIL_RETURN; \
     }
 

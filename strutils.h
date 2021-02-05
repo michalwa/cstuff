@@ -139,14 +139,38 @@ void str_inserts(String infix, size_t pos, String *str);
 // Replaces the specified substring in the given string with a replacement string
 void str_replace_slice(size_t offset, size_t len, String repl, String *str);
 
+// Flags for str_replace()
+typedef enum {
+    // Replaces all occurences instead of the first one
+    STR_REPLACE_ALL     = 0x1,
+    // Starts replacing from the right
+    // If replacing a single occurence, replaces the last one instead of the first
+    STR_REPLACE_REVERSE = 0x2,
+} StrReplaceFlags;
+
+// Replaces occurences of a string with a replacement string inside the given string
+// Returns the number of replaced occurences
+int str_replace(String pat, String repl, String *str, StrReplaceFlags flags);
+
 /* * * * * * * INSPECTION * * * * * * */
 
 // Returns true if the two strings are equal and false otherwise
 bool str_eq(String a, String b);
 
+// Finds the position of the first occurence of the needle string in the haystack string
+// Returns the 0-based position or -1 if not found
+// Starts the search at the given `offset`
+int str_lpos(String needle, String haystack, size_t offset);
+
+// Finds the position of the last occurence of the needle string in the haystack string
+// Returns the 0-based position or -1 if not found
+// Starts the search at the given `offset` from end end of the haystack string
+int str_rpos(String needle, String haystack, size_t offset);
+
 // Counts the number of occurences of the given byte in the string
 int str_count(char c, String str);
 
+// Flags for str_counts()
 typedef enum {
     // Count overlapping substring occurences
     STR_COUNT_OVERLAP = 0x1,
