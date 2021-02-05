@@ -249,5 +249,35 @@ int main() {
         str_free(str);
     });
 
+    String to_strip = str_ref(" . foo bar . ");
+
+    test("str_strip (none)", {
+        String str = str_clone(to_strip);
+        str_strip(" .", &str, 0);
+        assert(str_eq(to_strip, str));
+        str_free(str);
+    });
+
+    test("str_strip (left)", {
+        String str = str_clone(to_strip);
+        str_strip(" .", &str, STR_STRIP_LEFT);
+        assert(str_eq(str_ref("foo bar . "), str));
+        str_free(str);
+    });
+
+    test("str_strip (right)", {
+        String str = str_clone(to_strip);
+        str_strip(" .", &str, STR_STRIP_RIGHT);
+        assert(str_eq(str_ref(" . foo bar"), str));
+        str_free(str);
+    });
+
+    test("str_strip (both)", {
+        String str = str_clone(to_strip);
+        str_strip(" .", &str, STR_STRIP_LEFT | STR_STRIP_RIGHT);
+        assert(str_eq(str_ref("foo bar"), str));
+        str_free(str);
+    });
+
     str_free(heap);
 }

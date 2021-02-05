@@ -182,6 +182,25 @@ void str_inserts(String infix, size_t pos, String *str) {
     str->len += infix.len;
 }
 
+int str_strip(const char *chs, String *str, StrStripFlags flags) {
+    size_t i = 0;
+
+    if (flags & STR_STRIP_LEFT)
+        while (strchr(chs, str->str[i])) i++;
+
+    int end = 0;
+    size_t len = str->len - i;
+
+    if (flags & STR_STRIP_RIGHT)
+        while (strchr(chs, str->str[i + len - 1])) { len--; end++; }
+
+    String slice = str_slice(*str, i, len);
+    str_free(*str);
+    *str = slice;
+
+    return (int)i + end;
+}
+
 /* * * * * * * INSPECTION * * * * * * */
 
 bool str_eq(String a, String b) {

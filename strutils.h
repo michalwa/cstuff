@@ -120,6 +120,20 @@ void str_insert(char c, size_t pos, String *str);
 // to the end of the string
 void str_inserts(String infix, size_t pos, String *str);
 
+// Flags for str_strip()
+typedef enum {
+    // Strip from the left/beginning
+    STR_STRIP_LEFT  = 0x1,
+    // Strip from the right/end
+    STR_STRIP_RIGHT = 0x2,
+} StrStripFlags;
+
+// Strips characters included in the given C-string from the given string
+// Returns the number of stripped characters
+// If both STR_STRIP_LEFT and STR_STRIP_RIGHT is given in the flags,
+// returns the total number of characters stripped
+int str_strip(const char *chs, String *str, StrStripFlags flags);
+
 /* * * * * * * INSPECTION * * * * * * */
 
 // Returns true if the two strings are equal and false otherwise
