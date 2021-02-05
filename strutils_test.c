@@ -155,6 +155,11 @@ int main() {
         str_pushs(str_ref("!"),     &str);
 
         assert(str_eq(str_ref("Hello, world!"), str));
+
+        // Should do nothing
+        str_pushs(str_ref(""), &str);
+
+        assert(str_eq(str_ref("Hello, world!"), str));
         assert(str_eq(str_ref("Hello"),         clone));
 
         str_free(str);
@@ -187,16 +192,25 @@ int main() {
 
         assert(str_popn(&str, 1, &s));
         assert(str_eq(str_ref("!"), s));
+        assert(str_eq(str_ref("Hello, world"), str));
         str_free(s);
 
         assert(str_popn(&str, 5, &s));
         assert(str_eq(str_ref("world"), s));
+        assert(str_eq(str_ref("Hello, "), str));
+        str_free(s);
+
+        // Should pop empty string and not change the original string
+        assert(str_popn(&str, 0, &s));
+        assert(str_eq(str_ref(""), s));
+        assert(str_eq(str_ref("Hello, "), str));
         str_free(s);
 
         assert(!str_popn(&str, 10, NULL));
 
         assert(str_popn(&str, 7, &s));
         assert(str_eq(str_ref("Hello, "), s));
+        assert(str_eq(str_ref(""), str));
         str_free(s);
 
         assert(!str_popn(&str, 1, NULL));
@@ -223,6 +237,10 @@ int main() {
         String str = str_alloc("world");
 
         str_inserts(str_ref("Hello, "), 0, &str);
+        assert(str_eq(str_ref("Hello, world"), str));
+
+        // Should do nthing
+        str_inserts(str_ref(""), 3, &str);
         assert(str_eq(str_ref("Hello, world"), str));
 
         str_inserts(str_ref("!"), 100, &str);
