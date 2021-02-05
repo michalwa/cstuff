@@ -12,6 +12,8 @@
 #define OK_LEN 2
 #define OK " "COLOR_OK"\u2713"COLOR_NONE
 
+#define ERR " "COLOR_ERR"X\n"
+
 // Wraps a test block in pretty printf-s
 #define test(name, block) \
     printf("=> "COLOR_TEST name COLOR_NONE); \
@@ -26,7 +28,7 @@
 #define assert(cond) \
     if (cond) printf(OK); \
     else { \
-        printf("\n"COLOR_ERR"Assertion failed: "COLOR_NONE"%s (%s:%d)\n", \
+        printf(ERR"Assertion failed: "COLOR_NONE"%s (%s:%d)\n", \
                #cond, __FILE__, __LINE__); \
         return ASSERT_FAIL_RETURN; \
     }
@@ -35,7 +37,7 @@
 #define assert_eq(a, b, fmt) \
     if (a == b) printf(OK); \
     else { \
-        printf("\n"COLOR_ERR"Equality assertion failed (%s:%d):\n" \
+        printf(ERR"Equality assertion failed (%s:%d):\n" \
                "Left:  "fmt"\n" \
                "Right: "fmt"\n", __FILE__, __LINE__, a, b); \
         return ASSERT_FAIL_RETURN; \
@@ -45,7 +47,7 @@
 #define assert_neq(a, b, fmt) \
     if (a != b) printf(OK); \
     else { \
-        printf("\n"COLOR_ERR"Inequality assertion failed (%s:%d):\n" \
+        printf(ERR"Inequality assertion failed (%s:%d):\n" \
                "Left:  "fmt"\n" \
                "Right: "fmt"\n", __FILE__, __LINE__, a, b); \
         return ASSERT_FAIL_RETURN; \
@@ -55,7 +57,7 @@
 #define assert_streq(a, b) \
     if (!strcmp(a, b)) printf(OK); \
     else { \
-        printf("\n"COLOR_ERR"Equality assertion failed (%s:%d):\n" \
+        printf(ERR"Equality assertion failed (%s:%d):\n" \
                "Left:  %s\n" \
                "Right: %s\n", __FILE__, __LINE__, a, b); \
         return ASSERT_FAIL_RETURN; \
@@ -66,7 +68,7 @@
 #define assert_strneq(a, b) \
     if (strcmp(a, b)) printf(OK); \
     else { \
-        printf("\n"COLOR_ERR"Inequality assertion failed (%s:%d):\n" \
+        printf(ERR"Inequality assertion failed (%s:%d):\n" \
                "Left:  %s\n" \
                "Right: %s\n", __FILE__, __LINE__, a, b); \
         return ASSERT_FAIL_RETURN; \

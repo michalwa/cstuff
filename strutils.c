@@ -145,7 +145,11 @@ String str_strip(const char *chs, String str, StrStripFlags flags, int *out) {
         while (strchr(chs, str.str[i + len - 1])) { len--; end++; }
 
     if (out) *out = (int)i + end;
-    return str_slice(str, i, len);;
+
+    if (flags & STR_STRIP_HEAP)
+        return str_slice(str, i, len);
+    else
+        return str_slice_ref(str, i, len);
 }
 
 /* * * * * * * MUTATION * * * * * * */

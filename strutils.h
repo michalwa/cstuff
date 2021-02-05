@@ -99,10 +99,11 @@ typedef enum {
     STR_STRIP_LEFT  = 0x1,
     // Strip from the right/end
     STR_STRIP_RIGHT = 0x2,
+    // Allocate the new string on the heap
+    STR_STRIP_HEAP  = 0x4,
 } StrStripFlags;
 
 // Strips characters included in the given C-string from the given string
-// (creates a new allocated string)
 // Returns the number of stripped characters to `out`
 // If both STR_STRIP_LEFT and STR_STRIP_RIGHT is given in the flags,
 // returns the total number of characters stripped

@@ -260,25 +260,22 @@ int main() {
     test("str_strip (none)", {
         String str = str_strip(" .", to_strip, 0, NULL);
         assert(str_eq(to_strip, str));
-        str_free(str);
     });
 
     test("str_strip (left)", {
         String str = str_strip(" .", to_strip, STR_STRIP_LEFT, NULL);
         assert(str_eq(str_ref("foo bar . "), str));
-        str_free(str);
     });
 
     test("str_strip (right)", {
         String str = str_strip(" .", to_strip, STR_STRIP_RIGHT, NULL);
         assert(str_eq(str_ref(" . foo bar"), str));
-        str_free(str);
     });
 
     test("str_strip (both)", {
-        String str = str_strip(" .", to_strip, STR_STRIP_LEFT | STR_STRIP_RIGHT, NULL);
+        String str = str_strip(" .", to_strip,
+            STR_STRIP_LEFT | STR_STRIP_RIGHT, NULL);
         assert(str_eq(str_ref("foo bar"), str));
-        str_free(str);
     });
 
     str_free(heap);
