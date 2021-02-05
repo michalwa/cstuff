@@ -179,7 +179,7 @@ int str_count(char c, const String str) {
     return n;
 }
 
-int str_counts(const String needle, const String haystack) {
+int str_counts(const String needle, const String haystack, bool overlap) {
     STR_CHECK_VALID(needle,   str_counts);
     STR_CHECK_VALID(haystack, str_counts);
 
@@ -198,7 +198,10 @@ int str_counts(const String needle, const String haystack) {
             }
         }
 
-        if (eq) n++;
+        if (eq) {
+            if (!overlap) i += needle.len - 1;
+            n++;
+        }
     }
 
     return n;

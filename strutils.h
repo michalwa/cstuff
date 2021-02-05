@@ -118,9 +118,9 @@ bool str_eq(String a, String b);
 // Counts the number of occurences of the given byte in the string
 int str_count(char c, const String str);
 
-// Counts the number of occurencess of the given needle string in
-// the haystack string
-int str_counts(const String needle, const String haystack);
+// Counts the number of occurencess of the given needle string in the haystack string
+// The `overlap` flag tells whether to count overlapping occurences
+int str_counts(const String needle, const String haystack, bool overlap);
 
 // Tells whether the given string starts with the given prefix
 bool str_startswith(String prefix, String str);
