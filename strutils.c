@@ -132,6 +132,22 @@ String str_slice(String str, size_t offset, size_t len) {
     return str_nalloc(str.str + offset, len);
 }
 
+String str_strip(const char *chs, String str, StrStripFlags flags, int *out) {
+    size_t i = 0;
+
+    if (flags & STR_STRIP_LEFT)
+        while (strchr(chs, str.str[i])) i++;
+
+    int end = 0;
+    size_t len = str.len - i;
+
+    if (flags & STR_STRIP_RIGHT)
+        while (strchr(chs, str.str[i + len - 1])) { len--; end++; }
+
+    if (out) *out = (int)i + end;
+    return str_slice(str, i, len);;
+}
+
 /* * * * * * * MUTATION * * * * * * */
 
 void str_push(char c, String *str) {
@@ -182,23 +198,34 @@ void str_inserts(String infix, size_t pos, String *str) {
     str->len += infix.len;
 }
 
-int str_strip(const char *chs, String *str, StrStripFlags flags) {
-    size_t i = 0;
+void str_replace_slice(size_t offset, size_t len, String repl, String *str) {
+    if (len == 0)           { str_inserts(repl, offset, str); return; }
+    if (offset >= str->len) { str_pushs(repl, str); return; }
 
-    if (flags & STR_STRIP_LEFT)
-        while (strchr(chs, str->str[i])) i++;
+    //          ,----------- str->len -------------,
+    //   str    |############|@@@@@@@@@|%%%%%%%%%%%|
+    //          `-- offset --`-- len --`
+    //
+    //          ,--------------- r.len -----------------,
+    // r(esult) |############|??????????????|%%%%%%%%%%%|
+    //                       `-- repl.len --`
 
-    int end = 0;
-    size_t len = str->len - i;
+    String r;
+    r.flags = STR_VALID | STR_HEAP;
+    r.len   = str->len - len + repl.len;
+    r.bufsz = str_bufsz(r.len);
+    char *w = r.str = malloc(r.bufsz);
 
-    if (flags & STR_STRIP_RIGHT)
-        while (strchr(chs, str->str[i + len - 1])) { len--; end++; }
+    memcpy(w, str->str, offset);
+    w += offset;
 
-    String slice = str_slice(*str, i, len);
+    memcpy(w, repl.str, repl.len);
+    w += repl.len;
+
+    memcpy(w, str->str + offset + len, str->len - offset - len);
+
     str_free(*str);
-    *str = slice;
-
-    return (int)i + end;
+    *str = r;
 }
 
 /* * * * * * * INSPECTION * * * * * * */

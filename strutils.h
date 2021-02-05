@@ -93,6 +93,21 @@ String str_slice_ref(String str, size_t offset, size_t len);
 // Allocates a string by taking a slice of the given string
 String str_slice(String str, size_t offset, size_t len);
 
+// Flags for str_strip()
+typedef enum {
+    // Strip from the left/beginning
+    STR_STRIP_LEFT  = 0x1,
+    // Strip from the right/end
+    STR_STRIP_RIGHT = 0x2,
+} StrStripFlags;
+
+// Strips characters included in the given C-string from the given string
+// (creates a new allocated string)
+// Returns the number of stripped characters to `out`
+// If both STR_STRIP_LEFT and STR_STRIP_RIGHT is given in the flags,
+// returns the total number of characters stripped
+String str_strip(const char *chs, String str, StrStripFlags flags, int *out);
+
 /* * * * * * * MUTATION * * * * * * */
 
 // Appends the character to the given string
@@ -120,19 +135,8 @@ void str_insert(char c, size_t pos, String *str);
 // to the end of the string
 void str_inserts(String infix, size_t pos, String *str);
 
-// Flags for str_strip()
-typedef enum {
-    // Strip from the left/beginning
-    STR_STRIP_LEFT  = 0x1,
-    // Strip from the right/end
-    STR_STRIP_RIGHT = 0x2,
-} StrStripFlags;
-
-// Strips characters included in the given C-string from the given string
-// Returns the number of stripped characters
-// If both STR_STRIP_LEFT and STR_STRIP_RIGHT is given in the flags,
-// returns the total number of characters stripped
-int str_strip(const char *chs, String *str, StrStripFlags flags);
+// Replaces the specified substring in the given string with a replacement string
+void str_replace_slice(size_t offset, size_t len, String repl, String *str);
 
 /* * * * * * * INSPECTION * * * * * * */
 

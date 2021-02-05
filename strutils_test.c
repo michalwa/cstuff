@@ -246,32 +246,37 @@ int main() {
         str_free(str);
     });
 
+    test("str_replace_slice", {
+        String str = str_alloc("Hello, world!");
+
+        str_replace_slice(7, 5, str_ref("life"), &str);
+        assert(str_eq(str_ref("Hello, life!"), str));
+
+        str_free(str);
+    });
+
     String to_strip = str_ref(" . foo bar . ");
 
     test("str_strip (none)", {
-        String str = str_clone(to_strip);
-        str_strip(" .", &str, 0);
+        String str = str_strip(" .", to_strip, 0, NULL);
         assert(str_eq(to_strip, str));
         str_free(str);
     });
 
     test("str_strip (left)", {
-        String str = str_clone(to_strip);
-        str_strip(" .", &str, STR_STRIP_LEFT);
+        String str = str_strip(" .", to_strip, STR_STRIP_LEFT, NULL);
         assert(str_eq(str_ref("foo bar . "), str));
         str_free(str);
     });
 
     test("str_strip (right)", {
-        String str = str_clone(to_strip);
-        str_strip(" .", &str, STR_STRIP_RIGHT);
+        String str = str_strip(" .", to_strip, STR_STRIP_RIGHT, NULL);
         assert(str_eq(str_ref(" . foo bar"), str));
         str_free(str);
     });
 
     test("str_strip (both)", {
-        String str = str_clone(to_strip);
-        str_strip(" .", &str, STR_STRIP_LEFT | STR_STRIP_RIGHT);
+        String str = str_strip(" .", to_strip, STR_STRIP_LEFT | STR_STRIP_RIGHT, NULL);
         assert(str_eq(str_ref("foo bar"), str));
         str_free(str);
     });
