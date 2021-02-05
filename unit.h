@@ -9,17 +9,21 @@
 #define COLOR_TEST "\033[34;1m"
 #define COLOR_NONE "\033[0m"
 
+#define OK " "COLOR_OK"\u2713"COLOR_NONE
+
 // Wraps a test block in pretty printf-s
 #define test(name, block) \
     printf("=> "COLOR_TEST name COLOR_NONE); \
-    for (size_t i = sizeof(name); i < TEST_LABEL_WIDTH || i % 5; i++) \
-        printf(" "); \
+    for (size_t i = sizeof(name); \
+         i < TEST_LABEL_WIDTH || i % 5; \
+         i++) putchar(' '); \
+    printf(" |"); \
     do block while (0); \
-    printf(" |\n");
+    printf("\n");
 
 // Prints an error and returns if the condition is false
 #define assert(cond) \
-    if (cond) printf(" | "COLOR_OK"OK"COLOR_NONE); \
+    if (cond) printf(OK); \
     else { \
         printf("\n"COLOR_ERR"Assertion failed: "COLOR_NONE"%s (%s:%d)\n", \
                #cond, __FILE__, __LINE__); \
@@ -28,7 +32,7 @@
 
 // Prints an error and returns if the two values are not equal
 #define assert_eq(a, b, fmt) \
-    if (a == b) printf(" | "COLOR_OK"OK"COLOR_NONE); \
+    if (a == b) printf(OK); \
     else { \
         printf("\n"COLOR_ERR"Equality assertion failed (%s:%d):\n" \
                "Left:  "fmt"\n" \
@@ -38,7 +42,7 @@
 
 // Prints an error and returns if the two values are equal
 #define assert_neq(a, b, fmt) \
-    if (a != b) printf(" | "COLOR_OK"OK"COLOR_NONE); \
+    if (a != b) printf(OK); \
     else { \
         printf("\n"COLOR_ERR"Inequality assertion failed (%s:%d):\n" \
                "Left:  "fmt"\n" \
@@ -48,7 +52,7 @@
 
 // Prints an error and returns if the two C-strings are not equal
 #define assert_streq(a, b) \
-    if (!strcmp(a, b)) printf(" | "COLOR_OK"OK"COLOR_NONE); \
+    if (!strcmp(a, b)) printf(OK); \
     else { \
         printf("\n"COLOR_ERR"Equality assertion failed (%s:%d):\n" \
                "Left:  %s\n" \
@@ -59,7 +63,7 @@
 
 // Prints an error and returns if the two C-strings are equal
 #define assert_strneq(a, b) \
-    if (strcmp(a, b)) printf(" | "COLOR_OK"OK"COLOR_NONE); \
+    if (strcmp(a, b)) printf(OK); \
     else { \
         printf("\n"COLOR_ERR"Inequality assertion failed (%s:%d):\n" \
                "Left:  %s\n" \

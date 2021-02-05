@@ -195,10 +195,7 @@ int main() {
         assert(str_eq(str_ref("Hello, world"), str));
         str_free(s);
 
-        assert(str_popn(&str, 5, &s));
-        assert(str_eq(str_ref("world"), s));
-        assert(str_eq(str_ref("Hello, "), str));
-        str_free(s);
+        assert(str_popn(&str, 5, NULL));
 
         // Should pop empty string and not change the original string
         assert(str_popn(&str, 0, &s));
