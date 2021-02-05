@@ -83,12 +83,15 @@ int main() {
     });
 
     test("str_counts", {
-        assert_eq(1, str_counts(str2, str1, false), "%d");
-        assert_eq(3, str_counts(str3, str1, false), "%d");
-        assert_eq(2, str_counts(str3, str2, false), "%d");
+        assert_eq(1, str_counts(str2, str1, 0), "%d");
+        assert_eq(3, str_counts(str3, str1, 0), "%d");
+        assert_eq(2, str_counts(str3, str2, 0), "%d");
 
-        assert_eq(1, str_counts(str_ref("foofoo"), str_ref("foofoofoo"), false), "%d");
-        assert_eq(2, str_counts(str_ref("foofoo"), str_ref("foofoofoo"), true), "%d");
+        assert_eq(1, str_counts(str_ref("foofoo"),
+                                str_ref("foofoofoo"), 0), "%d");
+
+        assert_eq(2, str_counts(str_ref("foofoo"),
+                                str_ref("foofoofoo"), STR_COUNT_OVERLAP), "%d");
     });
 
     test("str_startswith", {

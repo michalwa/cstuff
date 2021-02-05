@@ -82,7 +82,7 @@ void str_free(String str);
 // Converts the string into a nul-terminated string.
 // The string buffer gets allocated on the heap
 // (unless string is luckily already nul-terminated)
-char *cstr(const String str);
+char *cstr(String str);
 
 /* * * * * * * TRANSFORMATION * * * * * * */
 
@@ -116,11 +116,15 @@ bool str_popn(String *str, size_t n, String *out);
 bool str_eq(String a, String b);
 
 // Counts the number of occurences of the given byte in the string
-int str_count(char c, const String str);
+int str_count(char c, String str);
+
+typedef enum {
+    // Count overlapping substring occurences
+    STR_COUNT_OVERLAP = 0x1,
+} StrCountFlags;
 
 // Counts the number of occurencess of the given needle string in the haystack string
-// The `overlap` flag tells whether to count overlapping occurences
-int str_counts(const String needle, const String haystack, bool overlap);
+int str_counts(String needle, String haystack, StrCountFlags flags);
 
 // Tells whether the given string starts with the given prefix
 bool str_startswith(String prefix, String str);

@@ -97,7 +97,7 @@ void str_free(String str) {
     free(str.str);
 }
 
-char *cstr(const String str) {
+char *cstr(String str) {
     STR_CHECK_VALID(str, cstr);
 
     // This would improve performance by preventing heap allocation, if the string
@@ -171,7 +171,7 @@ bool str_eq(String a, String b) {
     return !strncmp(a.str, b.str, a.len);
 }
 
-int str_count(char c, const String str) {
+int str_count(char c, String str) {
     STR_CHECK_VALID(str, str_count);
 
     int n = 0;
@@ -179,7 +179,7 @@ int str_count(char c, const String str) {
     return n;
 }
 
-int str_counts(const String needle, const String haystack, bool overlap) {
+int str_counts(String needle, String haystack, StrCountFlags flags) {
     STR_CHECK_VALID(needle,   str_counts);
     STR_CHECK_VALID(haystack, str_counts);
 
@@ -199,7 +199,9 @@ int str_counts(const String needle, const String haystack, bool overlap) {
         }
 
         if (eq) {
-            if (!overlap) i += needle.len - 1;
+            if (!(flags & STR_COUNT_OVERLAP))
+                i += needle.len - 1;
+
             n++;
         }
     }
