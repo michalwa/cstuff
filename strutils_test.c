@@ -1,12 +1,19 @@
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
 #include "unit.h"
 #include "strutils.h"
+
 
 #define with(type, var, alloc, block) do { \
     type *var = alloc; \
     do block while(0); \
     free(var); \
 } while(0);
+
+
+#define STR_MIN_BUFSZ 0x80
 
 int main() {
     const char *s1 = "Hello, world!";
