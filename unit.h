@@ -9,13 +9,14 @@
 #define COLOR_TEST "\033[34;1m"
 #define COLOR_NONE "\033[0m"
 
+#define OK_LEN 2
 #define OK " "COLOR_OK"\u2713"COLOR_NONE
 
 // Wraps a test block in pretty printf-s
 #define test(name, block) \
     printf("=> "COLOR_TEST name COLOR_NONE); \
     for (size_t i = sizeof(name); \
-         i < TEST_LABEL_WIDTH || i % 5; \
+         i < TEST_LABEL_WIDTH || i % OK_LEN; \
          i++) putchar(' '); \
     printf(" |"); \
     do block while (0); \
