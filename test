@@ -2,10 +2,14 @@
 
 mkdir -p build
 
-gcc \
+if gcc \
     strutils.c strutils_test.c \
-    -o build/strutils_test
-
-if [[ "$?" == "0" ]]; then
+    -o build/strutils_test; then
     ./build/strutils_test
+fi
+
+if gcc \
+    utf8.c utf8_test.c \
+    -o build/utf8_test; then
+    ./build/utf8_test
 fi

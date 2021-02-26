@@ -1,6 +1,9 @@
 #ifndef _UNITTEST_H
 #define _UNITTEST_H
 
+#include <stdio.h>
+#include <string.h>
+
 #define TEST_LABEL_WIDTH 20
 #define ASSERT_FAIL_RETURN 1
 
