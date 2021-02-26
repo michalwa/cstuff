@@ -25,12 +25,7 @@ int main() {
     String str1 = str_ref(s1);     // "Hello, world!"
     String str2 = str_nref(s1, 5); // "Hello"
     String str3 = str_ref("l");    // "l"
-
-    String heap = str_alloc("Hello, world!");
-
-    // Demo print
-    printf("str_ref(s1) = "STR_DEBUG_FMT"\n", STR_DEBUG_FMT_ARGS(str1));
-    printf("str_alloc() = "STR_DEBUG_FMT"\n", STR_DEBUG_FMT_ARGS(heap));
+    String heap = str_alloc(s1);   // "Hello, world!"
 
     // Test equality comparison first, so we can use it in assertions
     test("str_eq", {
@@ -134,9 +129,9 @@ int main() {
     });
 
     test("str_fmt", {
-        with(char, s, cstr(str_fmt(10, "")), assert_streq("", s));
-        with(char, s, cstr(str_fmt(100, "Hello, %s!", "world")),
-            assert_streq("Hello, world!", s));
+        assert_string_eq(str_fmt(""), str_ref(""));
+        assert_string_eq(str_fmt("Hello, %s!", "world"),
+                         str_ref("Hello, world!"));
     });
 
     test("str_push", {
@@ -316,6 +311,16 @@ int main() {
         String str = str_strip(" .", to_strip,
             STR_STRIP_LEFT | STR_STRIP_RIGHT, NULL);
         assert_string_eq(str_ref("foo bar"), str);
+    });
+
+    test("str_escape", {
+        String esc = str_escape(str_ref("Hello,\t\"world!\"\r\n"));
+        assert_string_eq(str_ref("Hello,\\t\\\"world!\\\"\\r\\n"), esc);
+        str_free(&esc);
+
+        esc = str_escape(str_ref("\x01\x0F\x45\x10\x67"));
+        assert_string_eq(str_ref("\\x01\\x0FE\\x10g"), esc);
+        str_free(&esc);
     });
 
     str_free(&heap);

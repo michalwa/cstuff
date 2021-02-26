@@ -1,0 +1,11 @@
+#!/usr/bin/bash
+
+mkdir -p build
+
+gcc \
+    strutils.c strutils_test.c \
+    -o build/strutils_test
+
+if [[ "$?" == "0" ]]; then
+    ./build/strutils_test
+fi

@@ -4,6 +4,8 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdarg.h>
+#include <ctype.h>
+#include <inttypes.h>
 
 /* * * * * * * Private Utilities * * * * * * */
 
@@ -22,7 +24,7 @@ size_t str_bufsz(size_t len) {
 
     // Least power of two greater than len
     size_t bufsz = 1;
-    for (; len; len >> 1, bufsz << 1);
+    for (; len; len >>= 1) bufsz <<= 1;
     return bufsz;
 }
 
@@ -70,21 +72,52 @@ String str_clone(String str) {
 
 /* * * * * * * PRINTING * * * * * * */
 
-String str_fmt(size_t bufsz, const char *fmt, ...) {
-    va_list args;
+void str_debug(String str) {
+    str_fdebug(stdout, str);
+}
+
+// Prints debug info for the given string to a file
+void str_fdebug(FILE *f, String str) {
+    String esc = str_escape(str);
+
+    fprintf(f,
+        "String {\n" \
+        "  flags = "BYTE_BIN_FMT",\n" \
+        "  bufsz = %zu,\n" \
+        "  len   = %zu,\n" \
+        "  str   = \"%.*s\"\n" \
+        "}\n",
+        BYTE_BIN_FMT_ARGS(str.flags),
+        str.bufsz, str.len,
+        STR_FMT_ARGS(esc));
+
+    str_free(&esc);
+}
+
+String str_fmt(const char *fmt, ...) {
+    if (!strchr(fmt, '%')) return str_alloc(fmt);
+
+    va_list args, temp_args;
     va_start(args, fmt);
 
-    String str;
-    str.flags = STR_VALID | STR_HEAP;
-    str.bufsz = str_bufsz(bufsz + 1); // space for null byte
-    str.str   = malloc(str.bufsz);
-    str.len   = vsnprintf(str.str, str.bufsz, fmt, args);
+    String str = {0};
 
-    if (str.len < 0)
-        fprintf(stderr, "str_fmt buffer capacity exceeded\n");
+    for (size_t bufsz = str_bufsz(0);; bufsz <<= 1) {
+        va_copy(temp_args, args);
+
+        str.flags = STR_HEAP;
+        str.bufsz = bufsz + 1; // space for null byte
+        str.str   = str.str ? realloc(str.str, str.bufsz) : malloc(str.bufsz);
+        str.len   = vsnprintf(str.str, str.bufsz, fmt, temp_args);
+
+        va_end(temp_args);
+
+        // The loop will continue until the string fits inside the buffer
+        if (str.len >= 0 && str.len < str.bufsz) break;
+    }
 
     va_end(args);
-
+    str.flags |= STR_VALID;
     return str;
 }
 
@@ -154,6 +187,39 @@ String str_strip(const char *chs, String str, StrStripFlags flags, int *out) {
     else
         return str_slice_ref(str, i, len);
 }
+
+String str_escape(String str) {
+    // Escape table (char -> sequence)
+    static char *ESC[0x100];
+    if (!ESC[0]) {
+        ESC['\0'] = "\\0";
+        ESC['\"'] = "\\\""; ESC['\''] = "\\'"; ESC['\\'] = "\\\\";
+        ESC['\a'] = "\\a";  ESC['\b'] = "\\b"; ESC['\n'] = "\\n";
+        ESC['\f'] = "\\f";  ESC['\r'] = "\\r"; ESC['\t'] = "\\t";
+        ESC['\v'] = "\\v";
+    }
+
+    String e = str_alloc("");
+
+    for (size_t i = 0; i < str.len; i++) {
+        char c = str.str[i];
+
+        if (ESC[c]) {
+            str_pushs(str_ref(ESC[c]), &e);
+        } else {
+            // TODO: Detect unicode and build \u escapes
+            if (!isprint(str.str[i])) {
+                String hex = str_fmt("\\x%02X", str.str[i]);
+                str_pushs(hex, &e);
+                str_free(&hex);
+            } else str_push(str.str[i], &e);
+        }
+    }
+
+    return e;
+}
+
+String str_unescape(String str) { /* TODO */ return str; }
 
 /* * * * * * * MUTATION * * * * * * */
 

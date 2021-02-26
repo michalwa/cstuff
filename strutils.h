@@ -1,6 +1,7 @@
 #ifndef _STRUTILS_H
 #define _STRUTILS_H
 
+#include <stdio.h>
 #include <stddef.h>
 #include <stdbool.h>
 
@@ -59,19 +60,14 @@ String str_clone(String str);
 #define STR_FMT "%.*s"
 #define STR_FMT_ARGS(s) (int)s.len, s.str
 
-#define STR_DEBUG_FMT \
-    "String {\n" \
-    "  flags = "BYTE_BIN_FMT",\n" \
-    "  bufsz = %zu,\n" \
-    "  len   = %zu,\n" \
-    "  str   = \"%.*s\"\n" \
-    "}"
-#define STR_DEBUG_FMT_ARGS(s) \
-    BYTE_BIN_FMT_ARGS(s.flags), \
-    s.bufsz, s.len, (int)s.len, s.str
+// Prints debug info for the given string to stdout
+void str_debug(String str);
+
+// Prints debug info for the given string to a file
+void str_fdebug(FILE *f, String str);
 
 // Creates a dynamically allocated string using sprintf
-String str_fmt(size_t bufsz, const char *fmt, ...);
+String str_fmt(const char *fmt, ...);
 
 /* * * * * * * CONSUMPTION * * * * * * */
 
@@ -108,6 +104,12 @@ typedef enum {
 // If both STR_STRIP_LEFT and STR_STRIP_RIGHT is given in the flags,
 // returns the total number of characters stripped
 String str_strip(const char *chs, String str, StrStripFlags flags, int *out);
+
+// Replaces special charcters with their corresponding C escape sequences
+String str_escape(String str);
+
+// Replaces C escape sequences with their corresponding characters
+String str_unescape(String str);
 
 /* * * * * * * MUTATION * * * * * * */
 
@@ -164,7 +166,7 @@ int str_lpos(String needle, String haystack, size_t offset);
 
 // Finds the position of the last occurence of the needle string in the haystack string
 // Returns the 0-based position or -1 if not found
-// Starts the search at the given `offset` from end end of the haystack string
+// Starts the search at the given `offset` from the end of the haystack string
 int str_rpos(String needle, String haystack, size_t offset);
 
 // Counts the number of occurences of the given byte in the string
