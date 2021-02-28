@@ -57,18 +57,35 @@ char *utf8_encode(char *buffer, uint32_t codepoint) {
     return buffer + len;
 }
 
-size_t utf8_len(char *str, size_t sz) {
-    size_t len = 0;
-    utf8_Decoder d = {0};
-
-    for (size_t i = 0; i < sz; i++) {
-        if (utf8_decode(&d, str[i])) len++;
-    }
-
-    return len;
-}
-
-uint8_t utf8_size(uint32_t codepoint) {
+inline uint8_t utf8_size(uint32_t codepoint) {
     char buf[4];
     return utf8_encode(buf, codepoint) - buf;
+}
+
+#include <stdio.h>
+
+inline char *utf8_skip(char *c) {
+    // Skip "10xxxxxx" bytes, so the pointer either ends up
+    // at a "0xxxxxxx" (ascii) or a "11xxxxxx" (utf8 header)
+    for (c++; (*c & 0xC0) == 0x80; c++);
+    return c;
+}
+
+inline char *utf8_pos(char *c, size_t i) {
+    // Same as utf8_skip, but decrements `i' instead of instantly
+    // exiting the loop, and exits the loop only when `i' is 0
+    while (i--) c = utf8_skip(c);
+    return c;
+}
+
+inline size_t utf8_len(char *str, size_t sz) {
+    size_t len = 0;
+    char *c = str;
+
+    // Same as utf8_pos, but increments length until the pointer reaches
+    // end of string (str + sz)
+    while ((size_t)(c - str) < sz)
+        if ((*c++ & 0xC0) != 0x80) len++;
+
+    return len;
 }

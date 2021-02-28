@@ -23,10 +23,17 @@ bool utf8_decode(utf8_Decoder *, char);
 // after the appended bytes
 char *utf8_encode(char *, uint32_t);
 
-// Returns the number of unicode codepoints in a given string
-size_t utf8_len(char *, size_t);
-
 // Returns the number of utf8 bytes needed to encode a given codepoint
 uint8_t utf8_size(uint32_t);
+
+// Increments the pointer until it reaches past the current utf8 sequence
+// and returns the resulting pointer
+char *utf8_skip(char *);
+
+// Returns a pointer to the first byte of the i-th codepoint of a given string
+char *utf8_pos(char *, size_t);
+
+// Returns the number of unicode codepoints in a given string
+size_t utf8_len(char *, size_t);
 
 #endif // _UTF8_H

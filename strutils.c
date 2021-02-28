@@ -48,7 +48,7 @@ String str_nref(const char *str, size_t len) {
     };
 }
 
-String str_ref(const char *str) {
+inline String str_ref(const char *str) {
     return str_nref(str, strlen(str));
 }
 
@@ -62,17 +62,17 @@ String str_nalloc(const char *str, size_t len) {
     };
 }
 
-String str_alloc(const char *str) {
+inline String str_alloc(const char *str) {
     return str_nalloc(str, strlen(str));
 }
 
-String str_clone(String str) {
+inline String str_clone(String str) {
     return str_nalloc(str.str, str.len);
 }
 
 /* * * * * * * PRINTING * * * * * * */
 
-void str_debug(String str) {
+inline void str_debug(String str) {
     str_fdebug(stdout, str);
 }
 
@@ -241,12 +241,18 @@ void str_pushs(String suffix, String *str) {
 }
 
 bool str_pop(String *str, char *out) {
+    if (!FLAGS_ALL(str->flags, STR_VALID | STR_HEAP))
+        fprintf(stderr, "Invalid string passed to str_pop\n");
+
     if (str->len == 0) return false;
     if (out) *out = str->str[--str->len];
     return true;
 }
 
 bool str_popn(String *str, size_t n, String *out) {
+    if (!FLAGS_ALL(str->flags, STR_VALID | STR_HEAP))
+        fprintf(stderr, "Invalid string passed to str_popn\n");
+
     if (str->len < n) return false;
     if (out) *out = str_slice(*str, str->len - n, n);
     str->len -= n;
@@ -254,6 +260,9 @@ bool str_popn(String *str, size_t n, String *out) {
 }
 
 void str_insert(char c, size_t pos, String *str) {
+    if (!FLAGS_ALL(str->flags, STR_VALID | STR_HEAP))
+        fprintf(stderr, "Invalid string passed to str_insert\n");
+
     if (pos >= str->len) { str_push(c, str); return; }
 
     str_ensure_buf(str, str->len + 1);
@@ -263,6 +272,9 @@ void str_insert(char c, size_t pos, String *str) {
 }
 
 void str_inserts(String infix, size_t pos, String *str) {
+    if (!FLAGS_ALL(str->flags, STR_VALID | STR_HEAP))
+        fprintf(stderr, "Invalid string passed to str_inserts\n");
+
     if (pos >= str->len) { str_pushs(infix, str); return; }
 
     str_ensure_buf(str, str->len + infix.len);
@@ -272,6 +284,9 @@ void str_inserts(String infix, size_t pos, String *str) {
 }
 
 void str_replace_slice(size_t offset, size_t len, String repl, String *str) {
+    if (!FLAGS_ALL(str->flags, STR_VALID | STR_HEAP))
+        fprintf(stderr, "Invalid string passed to str_replace_slice\n");
+
     if (len == 0)           { str_inserts(repl, offset, str); return; }
     if (offset >= str->len) { str_pushs(repl, str); return; }
 
@@ -288,13 +303,16 @@ void str_replace_slice(size_t offset, size_t len, String repl, String *str) {
     w += repl.len;
 
     memcpy(w, str->str + offset + len,
-              str->len - offset - len); // str[offset + len..]
+              str->len - offset - len); // str[(offset + len)..]
 
     str_free(str);
     *str = r;
 }
 
 int str_replace(String pat, String repl, String *str, StrReplaceFlags flags) {
+    if (!FLAGS_ALL(str->flags, STR_VALID | STR_HEAP))
+        fprintf(stderr, "Invalid string passed to str_replace\n");
+
     int (*pos_fn)(String, String, size_t) =
         (flags & STR_REPLACE_REVERSE) ? str_rpos : str_lpos;
 
