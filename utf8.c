@@ -1,5 +1,10 @@
 #include "utf8.h"
 
+void utf8_decoder_init(utf8_Decoder *d) {
+    d->state = 0;
+    d->codepoint = 0;
+}
+
 bool utf8_decode(utf8_Decoder *d, char byte) {
     // If last codepoint was decoded, begin new one
     if (!d->state) {
@@ -52,8 +57,8 @@ char *utf8_encode(char *buffer, uint32_t codepoint) {
     return buffer + len;
 }
 
-int utf8_len(char *str, size_t sz) {
-    int len = 0;
+size_t utf8_len(char *str, size_t sz) {
+    size_t len = 0;
     utf8_Decoder d = {0};
 
     for (size_t i = 0; i < sz; i++) {
@@ -61,4 +66,9 @@ int utf8_len(char *str, size_t sz) {
     }
 
     return len;
+}
+
+uint8_t utf8_size(uint32_t codepoint) {
+    char buf[4];
+    return utf8_encode(buf, codepoint) - buf;
 }

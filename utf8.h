@@ -11,16 +11,22 @@ typedef struct {
     uint32_t codepoint;
 } utf8_Decoder;
 
+// Returns a decoder with an initial state
+void utf8_decoder_init(utf8_Decoder *);
+
 // Decodes subsequent bytes of a string into utf8 codepoints
 // NOTE: Decoder has to be initialized to zero before decoding a new string!
-bool utf8_decode(utf8_Decoder *d, char next);
+bool utf8_decode(utf8_Decoder *, char);
 
 // Encodes subsequent codepoints into utf8 and appends the resulting
 // bytes to the given buffer, returning pointers to memory in the buffer
 // after the appended bytes
-char *utf8_encode(char *buffer, uint32_t codepoint);
+char *utf8_encode(char *, uint32_t);
 
 // Returns the number of unicode codepoints in a given string
-int utf8_len(char *str, size_t len);
+size_t utf8_len(char *, size_t);
+
+// Returns the number of utf8 bytes needed to encode a given codepoint
+uint8_t utf8_size(uint32_t);
 
 #endif // _UTF8_H
