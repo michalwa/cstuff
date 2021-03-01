@@ -78,7 +78,16 @@ inline char *utf8_pos(char *c, size_t i) {
     return c;
 }
 
-inline size_t utf8_len(char *str, size_t sz) {
+inline size_t utf8_len(char *c) {
+    size_t len = 0;
+
+    // Same as utf8_pos, but increments length until the pointer reaches
+    // the null byte
+    while (*c) if ((*c++ & 0xC0) != 0x80) len++;
+    return len;
+}
+
+inline size_t utf8_nlen(char *str, size_t sz) {
     size_t len = 0;
     char *c = str;
 

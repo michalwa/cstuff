@@ -44,6 +44,11 @@ String str_alloc(const char *str);
 // Requires str_free()
 String str_clone(String str);
 
+/* * * * * * * Input/Output * * * * * * */
+
+// Reads the entire contents of the file into a new heap-allocated string
+String fread_str(FILE *);
+
 /* * * * * * * PRINTING * * * * * * */
 
 #define BYTE_BIN_FMT "%c%c%c%c%c%c%c%c"

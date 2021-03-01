@@ -70,6 +70,23 @@ inline String str_clone(String str) {
     return str_nalloc(str.str, str.len);
 }
 
+/* * * * * * * Input/Output * * * * * * */
+
+String fread_str(FILE *f) {
+    fseek(f, 0, SEEK_END);
+
+    String str;
+    str.flags = STR_VALID | STR_HEAP;
+    str.len   = ftell(f);
+    str.bufsz = str_bufsz(str.len);
+    str.str   = malloc(str.bufsz);
+
+    rewind(f);
+    fread(str.str, 1, str.len, f);
+
+    return str;
+}
+
 /* * * * * * * PRINTING * * * * * * */
 
 inline void str_debug(String str) {

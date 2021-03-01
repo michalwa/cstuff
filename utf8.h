@@ -33,7 +33,10 @@ char *utf8_skip(char *);
 // Returns a pointer to the first byte of the i-th codepoint of a given string
 char *utf8_pos(char *, size_t);
 
+// Returns the number of unicode codepoints in a given null-terminated string
+size_t utf8_len(char *);
+
 // Returns the number of unicode codepoints in a given string
-size_t utf8_len(char *, size_t);
+size_t utf8_nlen(char *, size_t);
 
 #endif // _UTF8_H

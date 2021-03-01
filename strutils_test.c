@@ -323,5 +323,15 @@ int main() {
         str_free(&esc);
     });
 
+    test("fread_str", {
+        FILE *f = fopen("test.txt", "r");
+        String contents = fread_str(f);
+        fclose(f);
+
+        assert_string_eq(str_ref("Hello\nworld\n"), contents);
+
+        str_free(&contents);
+    });
+
     str_free(&heap);
 }
