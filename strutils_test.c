@@ -35,21 +35,21 @@ int main() {
     });
 
     test("str_lpos", {
-        assert_eq(0,  str_lpos(str1, str1, 0), "%d");
-        assert_eq(2,  str_lpos(str3, str1, 0), "%d");
-        assert_eq(10, str_lpos(str3, str1, 4), "%d");
+        assert_eq(0,  (int)str_lpos(str1, str1, 0), "%d");
+        assert_eq(2,  (int)str_lpos(str3, str1, 0), "%d");
+        assert_eq(10, (int)str_lpos(str3, str1, 4), "%d");
 
-        assert_eq(-1, str_lpos(str_ref("love"), str1, 0), "%d");
-        assert_eq(3,  str_lpos(str_ref("lo"), str1, 0), "%d");
+        assert_eq(-1, (int)str_lpos(str_ref("love"), str1, 0), "%d");
+        assert_eq(3,  (int)str_lpos(str_ref("lo"), str1, 0), "%d");
     });
 
     test("str_rpos", {
-        assert_eq(0,  str_rpos(str1, str1, 0), "%d");
-        assert_eq(10, str_rpos(str3, str1, 0), "%d");
-        assert_eq(3,  str_rpos(str3, str1, 4), "%d");
+        assert_eq(0,  (int)str_rpos(str1, str1, 0), "%d");
+        assert_eq(10, (int)str_rpos(str3, str1, 0), "%d");
+        assert_eq(3,  (int)str_rpos(str3, str1, 4), "%d");
 
-        assert_eq(-1, str_rpos(str_ref("love"), str1, 0), "%d");
-        assert_eq(3,  str_rpos(str_ref("lo"), str1, 0), "%d");
+        assert_eq(-1, (int)str_rpos(str_ref("love"), str1, 0), "%d");
+        assert_eq(3,  (int)str_rpos(str_ref("lo"), str1, 0), "%d");
     });
 
     test("cstr", {
@@ -311,6 +311,26 @@ int main() {
         String str = str_strip(" .", to_strip,
             STR_STRIP_LEFT | STR_STRIP_RIGHT, NULL);
         assert_string_eq(str_ref("foo bar"), str);
+    });
+
+    test("str_split", {
+        String to_split = str_ref("foo, , bar, baz");
+        String delim = str_ref(", ");
+        String out = {0};
+
+        assert(str_split(to_split, delim, &out));
+        assert_string_eq(str_ref("foo"), out);
+
+        assert(str_split(to_split, delim, &out));
+        assert_string_eq(str_ref(""), out);
+
+        assert(str_split(to_split, delim, &out));
+        assert_string_eq(str_ref("bar"), out);
+
+        assert(str_split(to_split, delim, &out));
+        assert_string_eq(str_ref("baz"), out);
+
+        assert(!str_split(to_split, delim, &out));
     });
 
     test("str_escape", {

@@ -141,10 +141,12 @@ String str_fmt(const char *fmt, ...) {
 /* * * * * * * CONSUMPTION * * * * * * */
 
 void str_free(String *str) {
-    if (!FLAGS_ALL(str->flags, STR_VALID | STR_HEAP)) return;
+    if (!(str->flags & STR_VALID)) return;
 
-    memset(str->str, 0, str->len);
-    free(str->str);
+    if (str->flags & STR_HEAP) {
+        memset(str->str, 0, str->len);
+        free(str->str);
+    }
 
     str->flags = 0;
     str->bufsz = 0;
@@ -198,11 +200,37 @@ String str_strip(const char *chs, String str, StrStripFlags flags, int *out) {
         while (strchr(chs, str.str[i + len - 1])) { len--; end++; }
 
     if (out) *out = (int)i + end;
+    return str_slice_ref(str, i, len);
+}
 
-    if (flags & STR_STRIP_HEAP)
-        return str_slice(str, i, len);
+bool str_split(String str, String delim, String *out) {
+    // ...xxx|delim xxxxxxxx|delim xxx...
+    //       ^-- start      ^-- end
+
+    size_t start;
+    if (out->str)
+        start = str_lpos(delim, str, out->str - str.str + out->len);
     else
-        return str_slice_ref(str, i, len);
+        start = str_lpos(delim, str, 0);
+
+    if (start == -1) {
+        if (out->str) return false;
+        else {
+            *out = str;
+            return true;
+        }
+    }
+
+    if (!out->str) {
+        *out = str_slice_ref(str, 0, start);
+        return true;
+    }
+
+    size_t end = str_lpos(delim, str, start + delim.len);
+    if (end == -1) end = str.len;
+
+    *out = str_slice_ref(str, start + delim.len, end - start - delim.len);
+    return true;
 }
 
 String str_escape(String str) {

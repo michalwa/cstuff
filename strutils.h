@@ -100,15 +100,20 @@ typedef enum {
     STR_STRIP_LEFT  = 0x1,
     // Strip from the right/end
     STR_STRIP_RIGHT = 0x2,
-    // Allocate the new string on the heap
-    STR_STRIP_HEAP  = 0x4,
 } StrStripFlags;
 
 // Strips characters included in the given C-string from the given string
-// Returns the number of stripped characters to `out`
-// If both STR_STRIP_LEFT and STR_STRIP_RIGHT is given in the flags,
-// returns the total number of characters stripped
+// Returns the number of stripped characters to `out`. If both STR_STRIP_LEFT
+// and STR_STRIP_RIGHT is given in the flags, returns the total number of characters stripped
+// The returned string is not heap-allocated and points to the original buffer.
 String str_strip(const char *chs, String str, StrStripFlags flags, int *out);
+
+// Splits a string by a given delimiter and writes subsequent portions
+// of the string into `out` returning true, and returns false when the
+// split portions have been exhausted. `out` has to always point to the
+// last returned portion of the string.
+// The returned strings are not heap-allocated and point to the original buffer.
+bool str_split(String str, String delim, String *out);
 
 // Replaces special charcters with their corresponding C escape sequences
 String str_escape(String str);
@@ -148,7 +153,7 @@ void str_replace_slice(size_t offset, size_t len, String repl, String *str);
 
 // Flags for str_replace()
 typedef enum {
-    // Replaces all occurences instead of the first one
+    // Replaces all occurences, not just the first one
     STR_REPLACE_ALL     = 0x1,
     // Starts replacing from the right
     // If replacing a single occurence, replaces the last one instead of the first
